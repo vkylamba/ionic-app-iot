@@ -1,0 +1,32 @@
+<ion-view view-title="Account">
+  <ion-content class="padding" ng-show="settings.is_logged_in">
+    <h2>Welcome to IoT</h2>
+    <p>
+    Click on login if you already have an account and device. Otherwise click on request account button.
+    </p>
+    <button class="button button-block button-assertive">
+      Go to Login
+    </button>
+    <button class="button button-block button-positive">
+      Request an account
+    </button>
+  </ion-content>
+
+  <ion-content class="padding" ng-show="settings.show_login">
+    <h2>Enter details to sign in</h2>
+    <div class="list">
+      <label class="item item-input item-floating-label">
+        <span class="input-label">Username</span>
+        <input type="text" placeholder="Username" ng-model="settings.user">
+      </label>
+      <label class="item item-input item-floating-label">
+        <span class="input-label">Password</span>
+        <input type="password" placeholder="password" ng-model="settings.password">
+      </label>
+      <label>{{login_message}}</label>
+    </div>
+    <button class="button button-block button-assertive" ng-click="login()">
+      Login
+    </button>
+  </ion-content>
+</ion-view>
