@@ -1,8 +1,12 @@
 <ion-view view-title="Devices">
   <ion-content>
+    <ion-refresher
+        pulling-text="Pull to refresh..."
+        on-refresh="doRefresh()">
+    </ion-refresher>
     <ion-list>
       <ion-item class="item-remove-animate item-avatar item-icon-right" ng-repeat="device in settings.devices_data" type="item-text-wrap" href="#/tab/chats/{{device.ip_address}}">
-        <img ng-src="{{settings.server_uri}}/{{device.face}}">
+        <img ng-src="{{DataServer.settings.server_uri}}{{device.face}}">
         <h2>{{device.ip_address}}</h2>
         <p>{{device.last_data_time}}</p>
         <i class="icon ion-chevron-right icon-accessory"></i>

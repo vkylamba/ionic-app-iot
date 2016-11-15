@@ -5,7 +5,7 @@
 // the 2nd parameter is an array of 'requires'
 // 'starter.services' is found in services.js
 // 'starter.controllers' is found in controllers.js
-angular.module('starter', ['ionic', 'ngStorage', 'starter.controllers', 'starter.services'])
+angular.module('starter', ['ionic', 'ngStorage', 'starter.controllers', 'starter.services', 'nvd3'])
 
 .run(function($ionicPlatform) {
   $ionicPlatform.ready(function() {
@@ -103,8 +103,8 @@ var _remove = function (thing_key) {
       delete each_thing;
   });
 }
-var _removeAll = function (thing_key) {
-  $localStorage.things = [];
+var _removeAll = function () {
+ $localStorage.things = [];
 }
 var _get = function(thing_key) {
   var the_thing = null;

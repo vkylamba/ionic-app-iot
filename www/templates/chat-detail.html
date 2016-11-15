@@ -6,9 +6,71 @@
 -->
 <ion-view view-title="{{settings.selected_device.ip_address}}">
   <ion-content class="padding">
-    <img ng-src="{{settings.server_uri}}/{{settings.selected_device.face}}" style="width: 64px; height: 64px">
-    <p>
-      {{settings.selected_device.lat}}, {{settings.selected_device.long}}
-    </p>
+    <ion-refresher
+      pulling-text="Pull to refresh..."
+      on-refresh="doRefresh()">
+    </ion-refresher>
+
+    <div class="list">
+      <div class="item item-thumbnail-left">
+        <img ng-src="{{DataServer.settings.server_uri}}{{settings.selected_device.face}}">
+        <h2>{{settings.device_data.ip_address}}</h2>
+        <p>Last data on {{settings.selected_device.last_data_time}}</p>
+        <p>Installed on {{settings.device_data.installation_date}}</p>
+        <p>Device type: <small ng-repeat="type in settings.device_data.type">{{type}},</small></p>
+      </div>
+      <div class="item item-button-right">
+        Show more info
+        <button class="button button-positive" ng-show="!settings.show_device_info" ng-click="settings.show_device_info=true">
+          <i class="icon ion-chevron-down"></i>
+        </button>
+        <button class="button button-positive" ng-show="settings.show_device_info" ng-click="settings.show_device_info=false">
+          <i class="icon ion-chevron-up"></i>
+        </button>
+      </div>
+      <div ng-show="settings.show_device_info">
+        <div class="item item-button-right">
+          Contact: {{settings.device_data.device_contact}}
+          <button class="button button-positive" ng-click="">
+          <i class="icon ion-ios-telephone"></i>
+        </button>
+        </div>
+        <div class="item">
+          Latest data:
+          <p>Power: {{settings.device_data.latest_data.power}}</p>
+          <p>Voltage: {{settings.device_data.latest_data.voltage}}</p>
+          <p>Current: {{settings.device_data.latest_data.current}}</p>
+          <p>Energy: {{settings.device_data.latest_data.energy}}</p>
+        </div>
+        <div class="item">
+          Last week:
+          <p>Avg power: {{settings.device_data.last_week_report.power.avg}}</p>
+          <p>Total Enery Consumption: {{settings.device_data.last_week_report.energy.max}}</p>
+          <p>Data packets received: {{settings.device_data.last_week_report.power.count}}</p>
+        </div>
+      </div>
+      <div class="item item-button-right">
+        Show operator info
+        <button class="button button-positive" ng-show="!settings.show_operator_info" ng-click="settings.show_operator_info=true">
+          <i class="icon ion-chevron-down"></i>
+        </button>
+        <button class="button button-positive" ng-show="settings.show_operator_info" ng-click="settings.show_operator_info=false">
+          <i class="icon ion-chevron-up"></i>
+        </button>
+      </div>
+      <div ng-show="settings.show_operator_info">
+        <div ng-show="settings.device_data.operator.name">
+          <a class="item item-thumbnail-left" ng-show="settings.show_operator_info">
+            <img ng-src="{{DataServer.settings.server_uri}}{{settings.device_data.operator.avatar}}">
+            <h2>{{settings.device_data.operator.name}}</h2>
+            <p>Contact {{settings.device_data.operator.contact}}</p>
+            <p>Address: {{settings.device_data.operator.address}}, {{settings.device_data.operator.pincode}}</p>
+          </a>
+        </div>
+        <div class="item" ng-show="!settings.device_data.operator.name">
+          Not Available.
+        </div>
+      </div>
+  </div>
   </ion-content>
 </ion-view>

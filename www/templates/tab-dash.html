@@ -1,5 +1,30 @@
 <ion-view view-title="Dashboard">
   <ion-content class="padding">
+    <ion-refresher
+      pulling-text="Pull to refresh..."
+      on-refresh="doRefresh()">
+    </ion-refresher>
+    <div class="item item-input-inset">
+      <label class="item-input-wrapper">
+        <i class="icon ion-search placeholder-icon"></i>
+        <input type="text" placeholder="IP address" ng-model="settings.search_term">
+      </label>
+      <button class="button button-small" ng-click="settings.show_device_list=!settings.show_device_list">
+        <div ng-show="!settings.show_device_list">Show devices</div>
+        <div ng-show="settings.show_device_list">Hide devices</div>
+      </button>
+
+    </div>
+
+    <div class="list card" ng-show="settings.show_device_list || settings.search_term != null">
+      <ion-list>
+        <ion-item class="item-remove-animate item-avatar item-icon-right" ng-repeat="device in settings.filtered_devices" type="item-text-wrap" ng-click="select_device(device)">
+          <img ng-src="{{DataServer.settings.server_uri}}{{device.face}}">
+          <h2>{{device.ip_address}}</h2>
+          <p>{{device.last_data_time}}</p>
+        </ion-item>
+      </ion-list>
+    </div>
     <h2>Welcome to Ionic</h2>
     <p>
     This is the Ionic starter for tabs-based apps. For other starters and ready-made templates, check out the <a href="http://market.ionic.io/starters" target="_blank">Ionic Market</a>.
@@ -13,5 +38,37 @@
     <p>
       For help sending push notifications, join the <a href="https://apps.ionic.io/signup" target="_blank">Ionic Platform</a> and check out <a href="http://docs.ionic.io/docs/push-overview" target="_blank">Ionic Push</a>. We also have other services available.
     </p>
+    <div class="item-list">
+      <div class="item">
+        <label>Device: {{settings.picked_device.ip_address}}</label>
+      </div>
+      <div class="item item-input-inset">
+        <label class="item-input-wrapper">
+          <select>
+            <option>Power</option>
+            <option selected>Energy</option>
+            <option>Runtime</option>
+            <option>Events</option>
+          </select>
+        </label>
+        <label class="item-input-wrapper">
+          <select>
+            <option>Today</option>
+            <option selected>Yesterday</option>
+            <option>Last week</option>
+            <option>Last month</option>
+          </select>
+        </label>
+        <label class="item-input-wrapper">
+          <select>
+            <option>Table</option>
+            <option selected>Pie</option>
+            <option>Column</option>
+            <option>Line</option>
+          </select>
+        </label>
+      </div>
+      <nvd3 options="settings.chart.options" data="settings.chart.data"></nvd3>
+    </div>
   </ion-content>
 </ion-view>

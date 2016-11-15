@@ -4,7 +4,7 @@
     <p>
     Click on login if you already have an account and device. Otherwise click on request account button.
     </p>
-    <button class="button button-block button-assertive">
+    <button class="button button-block button-assertive" ng-click="settings.show_login">
       Go to Login
     </button>
     <button class="button button-block button-positive">
@@ -23,7 +23,7 @@
         <span class="input-label">Password</span>
         <input type="password" placeholder="password" ng-model="settings.password">
       </label>
-      <label>{{login_message}}</label>
+      <label>{{settings.login_message}}</label>
     </div>
     <button class="button button-block button-assertive" ng-click="login()">
       Login
