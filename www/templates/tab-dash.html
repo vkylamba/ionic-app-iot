@@ -44,31 +44,22 @@
       </div>
       <div class="item item-input-inset">
         <label class="item-input-wrapper">
-          <select>
-            <option>Power</option>
-            <option selected>Energy</option>
-            <option>Runtime</option>
-            <option>Events</option>
+          <select ng-model="settings.selected_parameter" ng-change="selected_parameter_changed()">
+            <option ng-repeat="parameter in settings.device_parameters">{{parameter}}</option>
           </select>
         </label>
         <label class="item-input-wrapper">
-          <select>
-            <option>Today</option>
-            <option selected>Yesterday</option>
-            <option>Last week</option>
-            <option>Last month</option>
+          <select ng-model="settings.selected_time" ng-change="selected_time_changed()">
+            <option ng-repeat="parameter in settings.device_reports">{{parameter}}</option>
           </select>
         </label>
         <label class="item-input-wrapper">
-          <select>
-            <option>Table</option>
-            <option selected>Pie</option>
-            <option>Column</option>
-            <option>Line</option>
+          <select ng-model="settings.selected_plot_type" ng-change="selected_plot_type_changed()">
+            <option ng-repeat="parameter in settings.device_plot_types">{{parameter.key}}</option>
           </select>
         </label>
       </div>
-      <nvd3 options="settings.chart.options" data="settings.chart.data"></nvd3>
+      <nvd3 options="settings.chart.options" data="settings.chart.data" ></nvd3>
     </div>
   </ion-content>
 </ion-view>

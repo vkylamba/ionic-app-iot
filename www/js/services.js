@@ -1,54 +1,5 @@
 angular.module('starter.services', [])
 
-.factory('Chats', function() {
-  // Might use a resource here that returns a JSON array
-
-  // Some fake testing data
-  var chats = [{
-    id: 0,
-    name: 'Ben Sparrow',
-    lastText: 'You on your way?',
-    face: 'img/ben.png'
-  }, {
-    id: 1,
-    name: 'Max Lynx',
-    lastText: 'Hey, it\'s me',
-    face: 'img/max.png'
-  }, {
-    id: 2,
-    name: 'Adam Bradleyson',
-    lastText: 'I should buy a boat',
-    face: 'img/adam.jpg'
-  }, {
-    id: 3,
-    name: 'Perry Governor',
-    lastText: 'Look at my mukluks!',
-    face: 'img/perry.png'
-  }, {
-    id: 4,
-    name: 'Mike Harrington',
-    lastText: 'This is wicked good ice cream.',
-    face: 'img/mike.png'
-  }];
-
-  return {
-    all: function() {
-      return chats;
-    },
-    remove: function(chat) {
-      chats.splice(chats.indexOf(chat), 1);
-    },
-    get: function(chatId) {
-      for (var i = 0; i < chats.length; i++) {
-        if (chats[i].id === parseInt(chatId)) {
-          return chats[i];
-        }
-      }
-      return null;
-    }
-  };
-})
-
 .factory('DataServer', function($http, StorageService) {
   // Might use a resource here that returns a JSON array
 
@@ -118,6 +69,30 @@ angular.module('starter.services', [])
             var device_data = data;
             StorageService.add('device_'+device_id, JSON.stringify(data));
             return device_data;
+        }
+      })
+    },
+
+    get_device_dynamic_data: function(device_id, x, y, start_time, end_time) {
+
+      return $http({
+        method: 'GET',
+        url: settings.server_uri + '/api/device/dynamicdata/'+device_id
+          +'?x_params='+x+'&'
+          +'y_params='+y+'&'
+          +'start_time='+start_time+'&'
+          +'end_time='+end_time,
+        headers: {
+            "Authorization": 'Token ' + StorageService.get('token'),
+            'Access-Control-Request-Headers': 'Authorization',
+        }
+      }).success(function(data, status, headers, config) {
+        // this callback will be called asynchronously
+        // when the response is available
+        // console.log("data: " + JSON.stringify(data));
+        if(data.error == 'success')
+        {
+          return data.dynamic_data;
         }
       })
     },
