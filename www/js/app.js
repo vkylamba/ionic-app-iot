@@ -35,7 +35,8 @@ angular.module('starter', ['ionic', 'ngStorage', 'starter.controllers', 'starter
     .state('tab', {
     url: '/tab',
     abstract: true,
-    templateUrl: 'templates/tabs.html'
+    templateUrl: 'templates/tabs.html',
+    controller: 'AppCtrl'
   })
 
   // Each tab has its own nav history stack:
@@ -104,7 +105,8 @@ var _remove = function (thing_key) {
   });
 }
 var _removeAll = function () {
- $localStorage.things = [];
+  console.log($localStorage.things);
+  $localStorage.things = [];
 }
 var _get = function(thing_key) {
   var the_thing = null;

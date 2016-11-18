@@ -1,10 +1,10 @@
-<ion-view view-title="Account">
-  <ion-content class="padding" ng-show="settings.is_logged_in">
+<ion-view view-title="Account">  
+  <ion-content class="padding" ng-show="settings.is_logged_in == true && settings.show_login == false">
     <h2>Welcome to IoT</h2>
     <p>
     Click on login if you already have an account and device. Otherwise click on request account button.
     </p>
-    <button class="button button-block button-assertive" ng-click="settings.show_login">
+    <button class="button button-block button-assertive" ng-click="settings.show_login = true">
       Go to Login
     </button>
     <button class="button button-block button-positive">

@@ -3,8 +3,8 @@ angular.module('starter.services', [])
 .factory('DataServer', function($http, StorageService) {
   // Might use a resource here that returns a JSON array
 
-  // Some fake testing data
   var server_uri = "http://iotforeverything.herokuapp.com";
+  // var server_uri = "http://localhost:8113";
   var settings = {
     server_uri: server_uri
   }
@@ -94,6 +94,25 @@ angular.module('starter.services', [])
         {
           return data.dynamic_data;
         }
+      })
+    },
+
+    send_command: function(device_id, command, command_val, method){
+      return $http({
+        method: 'POST',
+        url: settings.server_uri + '/api/device/sendcommand/'+device_id,
+        data: {
+            "command": command, "command_param": command_val, "method": method
+        },
+        headers: {
+            "Authorization": 'Token ' + StorageService.get('token'),
+            'Access-Control-Request-Headers': 'Authorization',
+        }
+      }).success(function(data){
+        return data.error;
+      }).error(function(data, status, headers, config) {
+        console.log(data)
+        return false;
       })
     },
 

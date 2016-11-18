@@ -71,6 +71,41 @@
           Not Available.
         </div>
       </div>
+
+      <div class="item item-button-right">
+        Contorl device
+        <button class="button button-positive" ng-show="!settings.show_device_controls" ng-click="settings.show_device_controls=true">
+          <i class="icon ion-chevron-down"></i>
+        </button>
+        <button class="button button-positive" ng-show="settings.show_device_controls" ng-click="settings.show_device_controls=false">
+          <i class="icon ion-chevron-up"></i>
+        </button>
+      </div>
+      <div class="list" ng-show="settings.show_device_controls">
+        <div class="item">
+          Command:
+          <select ng-model="settings.selected_command" ng-change="selected_command_changed()">
+            <option ng-repeat="command in settings.device_data.commands">{{command}}</option>
+          </select>
+        </div>
+        <div class="item">
+          <input type="text" placeholder="Command Value" ng-model="settings.selected_command_val">
+        </div>
+        <div class="item item-toggle">
+          Send via SMS?
+          <label class="toggle toggle-assertive">
+           <input type="checkbox" ng-model="settings.command_via_sms">
+           <div class="track">
+             <div class="handle"></div>
+           </div>
+         </label>
+        </div>
+        <div class="item">
+          <button class="button button-block button-assertive" ng-click="send_command()">
+            Send command
+          </button>
+        </div>
+      </div>
   </div>
   </ion-content>
 </ion-view>

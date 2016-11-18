@@ -1,5 +1,24 @@
 angular.module('starter.controllers', [])
+.controller('AppCtrl', function($scope, $ionicModal, $timeout, StorageService, DataServer) {
 
+  // With the new view caching in Ionic, Controllers are only called
+  // when they are recreated or on app start, instead of every page change.
+  // To listen for when this page is active (for example, to refresh data),
+  // listen for the $ionicView.enter event:
+  //$scope.$on('$ionicView.enter', function(e) {
+  //});
+  $scope.settings = {
+    is_logged_in: false,
+  };
+  $scope.$on('$ionicView.enter', function(e) {
+    if(StorageService.get("username") != null)
+      $scope.settings.is_logged_in = true;
+  });
+  $scope.logout = function() {
+    StorageService.removeAll();
+    $scope.settings.is_logged_in = false;
+  }
+})
 .controller('DashCtrl', function($scope, StorageService, DataServer) {
   $scope.settings = {
     devices_data: [],
@@ -57,7 +76,9 @@ angular.module('starter.controllers', [])
   $scope.doRefresh = function() {
     DataServer.get_devices_list()
     .success(function(data){
-      $scope.settings.devices_data = data;
+      var devices = StorageService.get('devices');
+      devices = JSON.parse(devices);
+      $scope.settings.devices_data = devices;
     })
     .finally(function() {
        // Stop the ion-refresher from spinning
@@ -67,7 +88,7 @@ angular.module('starter.controllers', [])
 
   $scope.$watch('settings.search_term', function() {
     var search_ip = $scope.settings.search_term;
-    $scope.settings.filtered_devices = $scope.settings.devices_data;
+    $scope.settings.filtered_devices = $scope.settings.devices_data;``
     if(search_ip != null && $scope.settings.devices_data)
     {
       $scope.settings.filtered_devices = [];
@@ -130,33 +151,33 @@ angular.module('starter.controllers', [])
     var start_time = null;
     var end_time = null;
     var time = new Date();
-    start_time = time.getUTCDate()+'/'+time.getUTCMonth()+'/'+time.getUTCFullYear();
+    start_time = time.getUTCDate()+'/'+(parseInt(time.getUTCMonth(), 10)+1)+'/'+time.getUTCFullYear();
     var temp = new Date();
     if($scope.settings.selected_time == 'Today')
     {
       temp.setDate(time.getUTCDate() + 1)
-      end_time = temp.getUTCDate()+'/'+temp.getUTCMonth()+'/'+temp.getUTCFullYear();
+      end_time = temp.getUTCDate()+'/'+(parseInt(temp.getUTCMonth(), 10)+1)+'/'+temp.getUTCFullYear();
     }
     else if($scope.settings.selected_time == 'Yesterday')
     {
-      temp.setDate(time.getUTCDate() + 1)
-      end_time = temp.getUTCDate()+'/'+temp.getUTCMonth()+'/'+temp.getUTCFullYear();
+      temp.setDate(time.getUTCDate() - 1)
+      end_time = temp.getUTCDate()+'/'+(parseInt(temp.getUTCMonth(), 10)+1)+'/'+temp.getUTCFullYear();
       temp = start_time;
       start_time = end_time;
       end_time = temp;
     }
     else if($scope.settings.selected_time == 'Lastweek')
     {
-      temp.setDate(time.getUTCDate() + 7)
-      end_time = temp.getUTCDate()+'/'+temp.getUTCMonth()+'/'+temp.getUTCFullYear();
+      temp.setDate(time.getUTCDate() - 7)
+      end_time = temp.getUTCDate()+'/'+(parseInt(temp.getUTCMonth(), 10)+1)+'/'+temp.getUTCFullYear();
       temp = start_time;
       start_time = end_time;
       end_time = temp;
     }
     else if($scope.settings.selected_time == 'Lastmonth')
     {
-      temp.setDate(time.getUTCDate() + 30)
-      end_time = temp.getUTCDate()+'/'+temp.getUTCMonth()+'/'+temp.getUTCFullYear();
+      temp.setDate(time.getUTCDate() - 30)
+      end_time = temp.getUTCDate()+'/'+(parseInt(temp.getUTCMonth(), 10)+1)+'/'+temp.getUTCFullYear();
       temp = start_time;
       start_time = end_time;
       end_time = temp;
@@ -165,6 +186,8 @@ angular.module('starter.controllers', [])
     if(y == '' | y == null)
       return;
     if(start_time == null || end_time == null)
+      return;
+    if($scope.settings.selected_plot_type == null)
       return;
 
     DataServer.get_device_dynamic_data($scope.settings.picked_device.ip_address, x, y, start_time, end_time).then(function(data) {
@@ -197,7 +220,7 @@ angular.module('starter.controllers', [])
         showLabels: true,
         duration: 500,
         stacked: true,
-        title: "Demo chart"
+        title: parameter + ' ' + time
       }
     };
 
@@ -206,22 +229,12 @@ angular.module('starter.controllers', [])
         showMaxMin: false
       }
       options.chart.yAxis = {
-        axisLabel: 'GitHub Stars',
+        axisLabel: parameter + ' ' + time,
         tickFormat: function(d) {
           return d3.format(',.2f')(d);
         }
       }
     }
-
-    var stars = {  
-      "Angular" : [18567 , 44913],
-      "Backbone" : [16651 , 23633],
-      "Ember" : [9023 , 15249],
-      "Flight" : [4655 , 6380],
-      "Knockout" : [4487 , 6990],
-      "Marionette" : [4261 , 6629],
-      "React" : [3691 , 32656]
-    };
 
     var chartdata = [];
     var dev_data = device_data.data.dynamic_data;
@@ -245,6 +258,10 @@ angular.module('starter.controllers', [])
     }
     console.log(chartdata)
 
+    if(plot_type == 'pieChart')
+    {
+      chartdata = chartdata[0].values;
+    }
     $scope.settings.chart.options = options;
     $scope.settings.chart.data = chartdata;
     // $scope.api.refresh();
@@ -268,7 +285,9 @@ angular.module('starter.controllers', [])
     if(devices == null)
       DataServer.get_devices_list()
       .success(function(data){
-        $scope.settings.devices_data = data;
+        devices = StorageService.get('devices');
+        devices = JSON.parse(devices);
+        $scope.settings.devices_data = devices;
       })
     else
     {
@@ -284,7 +303,9 @@ angular.module('starter.controllers', [])
   $scope.doRefresh = function() {
     DataServer.get_devices_list()
     .success(function(data){
-      $scope.settings.devices_data = data;
+      var devices = StorageService.get('devices')
+      devices = JSON.parse(devices);
+      $scope.settings.devices_data = devices;
     })
     .finally(function() {
        // Stop the ion-refresher from spinning
@@ -296,16 +317,22 @@ angular.module('starter.controllers', [])
 .controller('DeviceDetailCtrl', function($scope, $stateParams, StorageService, DataServer) {
 
   $scope.settings = {
-    devices: StorageService.get('devices'),
+    devices: JSON.parse(StorageService.get('devices')),
     selected_device: null,
     device_data: null,
+    show_device_controls: false,
+    selected_command: null,
+    selected_command_val: null,
+    device_command_vals: null,
+    command_via_sms: false,
   }
 
   $scope.search_device = function(device_id){
     var the_device = null;
-    if($scope.settings.devices_data)
+    console.log($scope.settings.devices)
+    if($scope.settings.devices)
     {
-      $scope.settings.devices_data.map(function(device){
+      $scope.settings.devices.map(function(device){
         {
           if(device.ip_address == device_id)
             the_device = device
@@ -317,7 +344,6 @@ angular.module('starter.controllers', [])
 
   $scope.$on('$ionicView.enter', function(e) {
     $scope.settings.selected_device = $scope.search_device($stateParams.chatId);
-
     if($scope.settings.selected_device != null)
     {
       var device_data = StorageService.get('device_'+$scope.settings.selected_device.ip_address)
@@ -326,7 +352,8 @@ angular.module('starter.controllers', [])
       {
         DataServer.get_device_data($scope.settings.selected_device.ip_address)
         .success(function(data){
-          $scope.settings.device_data = data;
+          device_data = StorageService.get('device_'+$scope.settings.selected_device.ip_address)
+          $scope.settings.device_data = JSON.parse(device_data);
         })
       }
       else
@@ -337,6 +364,30 @@ angular.module('starter.controllers', [])
     }
   });
 
+  $scope.selected_command_changed = function() {
+
+  }
+
+  $scope.send_command = function() {
+    var device = $scope.settings.selected_device.ip_address;
+    if(device)
+    {
+      var command = $scope.settings.selected_command;
+      var command_val = $scope.settings.selected_command_val;
+      var method = '0';
+      if($scope.settings.command_via_sms)
+        method = '1';
+
+      DataServer.send_command(device, command, command_val, method).success(function(data) {
+        if(data.error == "success")
+          alert("Command sent.")
+        else
+          alert("Error: " + data.error)
+        console.log(data)
+      });
+    }
+  }
+
 
   $scope.doRefresh = function() {
     $scope.settings.selected_device = $scope.search_device($stateParams.chatId);
@@ -344,19 +395,21 @@ angular.module('starter.controllers', [])
     {
       DataServer.get_device_data($scope.settings.selected_device.ip_address)
       .success(function(data){
-        $scope.settings.device_data = data;
+        var device_data = StorageService.get('device_'+$scope.settings.selected_device.ip_address)
+        $scope.settings.device_data = JSON.parse(device_data);
       })
       .finally(function() {
          // Stop the ion-refresher from spinning
          $scope.$broadcast('scroll.refreshComplete');
        });
     }
+    $scope.$broadcast('scroll.refreshComplete');
   }
 
 
 })
 
-.controller('AccountCtrl', function($http, $scope, StorageService, DataServer) {
+.controller('AccountCtrl', function($http, $scope, StorageService, DataServer, $ionicSideMenuDelegate) {
   // StorageService.removeAll();
   $scope.check_login = function(){
     var username = StorageService.get('username')
@@ -373,8 +426,8 @@ angular.module('starter.controllers', [])
   }
 
   $scope.settings = {
-    is_logged_in: false,//Check the cookie value here.
-    show_login: $scope.check_login(),
+    is_logged_in: $scope.check_login(),//Check the cookie value here.
+    show_login: false,
     user: '',
     password: '',
     login_message: ''
@@ -383,10 +436,16 @@ angular.module('starter.controllers', [])
   $scope.login = function(){
     $scope.settings.show_login = true;
     $scope.settings.login_message = DataServer.login($scope.settings.user, $scope.settings.password).success(function(result){
-      $scope.settings.show_login = false;  
+      $scope.settings.show_login = false;
+      $scope.settings.is_logged_in = false; 
     }).error(function(data){
       console.log(data)
       $scope.settings.login_message = "Invalid login";
     });
   }
+
+  $scope.toggleLeftSideMenu = function() {
+    $ionicSideMenuDelegate.toggleLeft();
+  };
+
 });
