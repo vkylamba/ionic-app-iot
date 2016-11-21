@@ -29,4 +29,29 @@
       Login
     </button>
   </ion-content>
+
+
+  <ion-content class="padding" ng-show="settings.is_logged_in == false && settings.show_login == false">
+    <ion-refresher
+      pulling-text="Pull to refresh..."
+      on-refresh="doRefresh()">
+    </ion-refresher>
+    <div class="item item-button-right">
+      Show events last week
+      <button class="button button-positive" ng-show="!settings.show_events" ng-click="settings.show_events=true">
+        <i class="icon ion-chevron-down"></i>
+      </button>
+      <button class="button button-positive" ng-show="settings.show_events" ng-click="settings.show_events=false">
+        <i class="icon ion-chevron-up"></i>
+      </button>
+    </div>
+    <div ng-show="settings.show_events">
+      <div class="item" ng-repeat="event in settings.events_list">
+        <p>Device: {{event.device}}</p>
+        <p>Event:{{event.event}}</p>
+        <p>Type: {{event.type}}</p>
+        <p>Time: {{formatTime(event.time)}}</p>
+      </div>
+    </div>
+  </ion-content>
 </ion-view>

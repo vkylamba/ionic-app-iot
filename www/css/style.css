@@ -1,1 +1,3 @@
 /* Empty. Add your own CSS if you like */
+div.outer { overflow: scroll; }
+div.outer .inner { width: 1024px; }

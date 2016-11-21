@@ -226,7 +226,13 @@ angular.module('starter.controllers', [])
 
     if(plot_type != 'pieChart'){
       options.chart.xAxis = {
-        showMaxMin: false
+        showMaxMin: false,
+        tickFormat: function(d) {
+          // console.log(d);
+          if($scope.settings.selected_time == 'Today' || $scope.settings.selected_time == 'Yesterday')
+            return d3.time.format('%d %B %Y %H:%M')(d)
+          return d3.time.format("%d %B %Y")(d)
+          }
       }
       options.chart.yAxis = {
         axisLabel: parameter + ' ' + time,
@@ -238,6 +244,9 @@ angular.module('starter.controllers', [])
 
     var chartdata = [];
     var dev_data = device_data.data.dynamic_data;
+    var pieTicks = function(date){
+      return d3.time.format("%d %B %Y")(date);
+    }
     for(var param in dev_data)
     {
       if(param == "time")
@@ -249,7 +258,7 @@ angular.module('starter.controllers', [])
 
       for(var i=0;i<dev_data[param].length;i++){
         var value = {
-          label: dev_data['time'][i],
+          label: (plot_type == 'pieChart')?pieTicks(new Date(dev_data['time'][i])):new Date(dev_data['time'][i]),
           value: dev_data[param][i],
         }
         the_data.values.push(value)
@@ -299,6 +308,11 @@ angular.module('starter.controllers', [])
   $scope.remove = function(device) {
     // Chats.remove(chat);
   };
+
+  $scope.formatTime = function(d) {
+    var date = new Date(d);
+    return d3.time.format('%d %B %Y %H:%M')(date);
+  },
 
   $scope.doRefresh = function() {
     DataServer.get_devices_list()
@@ -388,6 +402,10 @@ angular.module('starter.controllers', [])
     }
   }
 
+  $scope.formatTime = function(d) {
+    var date = new Date(d);
+    return d3.time.format('%d %B %Y %H:%M')(date);
+  },
 
   $scope.doRefresh = function() {
     $scope.settings.selected_device = $scope.search_device($stateParams.chatId);
@@ -430,7 +448,8 @@ angular.module('starter.controllers', [])
     show_login: false,
     user: '',
     password: '',
-    login_message: ''
+    login_message: '',
+    events_list: null,
   }
 
   $scope.login = function(){
@@ -443,6 +462,48 @@ angular.module('starter.controllers', [])
       $scope.settings.login_message = "Invalid login";
     });
   }
+
+  $scope.formatTime = function(d) {
+    var date = new Date(d);
+    return d3.time.format('%d %B %Y %H:%M')(date);
+  }
+
+  $scope.fetch_past_events = function(use_cache=true){
+    var events_data = StorageService.get('events');
+    if(events_data == null || use_cache == false)
+    {
+      var time = new Date();
+      start_time = time.getUTCDate()+'/'+(parseInt(time.getUTCMonth(), 10)+1)+'/'+time.getUTCFullYear();
+      var temp = new Date()
+      temp.setDate(time.getUTCDate() - 7)
+      end_time = temp.getUTCDate()+'/'+(parseInt(temp.getUTCMonth(), 10)+1)+'/'+temp.getUTCFullYear();
+      temp = start_time;
+      start_time = end_time;
+      end_time = temp;
+
+      DataServer.get_events_data(null, start_time, end_time)
+      .success(function(data){
+        events_data = StorageService.get('events')
+        $scope.settings.events_list = JSON.parse(events_data);
+        console.log($scope.settings.events_list)
+      })
+    }
+    else
+    {
+      $scope.settings.events_list = JSON.parse(events_data);
+      console.log($scope.settings.events_list);
+    }
+  }
+  $scope.$on('$ionicView.enter', function(e) {
+    // alert(events_data);
+    $scope.fetch_past_events();
+  });
+
+  $scope.doRefresh = function() {
+    $scope.fetch_past_events(use_cache=false);
+    $scope.$broadcast('scroll.refreshComplete');
+  }
+
 
   $scope.toggleLeftSideMenu = function() {
     $ionicSideMenuDelegate.toggleLeft();

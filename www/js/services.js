@@ -3,8 +3,9 @@ angular.module('starter.services', [])
 .factory('DataServer', function($http, StorageService) {
   // Might use a resource here that returns a JSON array
 
-  var server_uri = "http://iotforeverything.herokuapp.com";
-  // var server_uri = "http://localhost:8113";
+  // var server_uri = "http://iotforeverything.herokuapp.com";
+  var server_uri = "http://remotemonitoring.herokuapp.com";
+  // var server_uri = "http://localhost:2201";
   var settings = {
     server_uri: server_uri
   }
@@ -113,6 +114,26 @@ angular.module('starter.services', [])
       }).error(function(data, status, headers, config) {
         console.log(data)
         return false;
+      })
+    },
+
+    get_events_data: function(device_id, start_time, end_time) {
+
+      return $http({
+        method: 'GET',
+        url: settings.server_uri + '/api/events/past'+ (device_id != null? ('/' + device_id):'')
+          +'?start_time='+start_time+'&'
+          +'end_time='+end_time,
+        headers: {
+            "Authorization": 'Token ' + StorageService.get('token'),
+            'Access-Control-Request-Headers': 'Authorization',
+        }
+      }).success(function(data, status, headers, config) {
+        // this callback will be called asynchronously
+        // when the response is available
+        // console.log("data: " + JSON.stringify(data));
+        StorageService.add('events', JSON.stringify(data));
+        return data;
       })
     },
 

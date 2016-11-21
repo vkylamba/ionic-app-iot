@@ -3,6 +3,7 @@
   "version": "1.1.1",
   "description": "iot: An Ionic project",
   "dependencies": {
+    "@ionic/cloud-angular": "^0.7.0",
     "angular-nvd3": "^1.0.9",
     "gulp": "^3.5.6",
     "gulp-concat": "^2.2.0",

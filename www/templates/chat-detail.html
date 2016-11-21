@@ -15,7 +15,7 @@
       <div class="item item-thumbnail-left">
         <img ng-src="{{DataServer.settings.server_uri}}{{settings.selected_device.face}}">
         <h2>{{settings.device_data.ip_address}}</h2>
-        <p>Last data on {{settings.selected_device.last_data_time}}</p>
+        <p>Last data on {{formatTime(settings.selected_device.last_data_time)}}</p>
         <p>Installed on {{settings.device_data.installation_date}}</p>
         <p>Device type: <small ng-repeat="type in settings.device_data.type">{{type}},</small></p>
       </div>
@@ -32,20 +32,20 @@
         <div class="item item-button-right">
           Contact: {{settings.device_data.device_contact}}
           <button class="button button-positive" ng-click="">
-          <i class="icon ion-ios-telephone"></i>
+          <i class="icon ion-ios-telephone" href="tel:{{settings.device_data.device_contact}}"></i>
         </button>
         </div>
         <div class="item">
           Latest data:
-          <p>Power: {{settings.device_data.latest_data.power}}</p>
-          <p>Voltage: {{settings.device_data.latest_data.voltage}}</p>
-          <p>Current: {{settings.device_data.latest_data.current}}</p>
-          <p>Energy: {{settings.device_data.latest_data.energy}}</p>
+          <p>Power: {{settings.device_data.latest_data.power}} W</p>
+          <p>Voltage: {{settings.device_data.latest_data.voltage}} V</p>
+          <p>Current: {{settings.device_data.latest_data.current}} Amp</p>
+          <p>Energy: {{settings.device_data.latest_data.energy}} KWH</p>
         </div>
         <div class="item">
           Last week:
-          <p>Avg power: {{settings.device_data.last_week_report.power.avg}}</p>
-          <p>Total Enery Consumption: {{settings.device_data.last_week_report.energy.max}}</p>
+          <p>Avg power: {{(settings.device_data.last_week_report.power.avg/1000).toFixed(2)}} W</p>
+          <p>Total Enery Consumption: {{(settings.device_data.last_week_report.energy.maximum/3600000).toFixed(2)}} KWH</p>
           <p>Data packets received: {{settings.device_data.last_week_report.power.count}}</p>
         </div>
       </div>
