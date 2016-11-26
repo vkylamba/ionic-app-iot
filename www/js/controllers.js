@@ -88,7 +88,7 @@ angular.module('starter.controllers', [])
 
   $scope.$watch('settings.search_term', function() {
     var search_ip = $scope.settings.search_term;
-    $scope.settings.filtered_devices = $scope.settings.devices_data;``
+    $scope.settings.filtered_devices = $scope.settings.devices_data;
     if(search_ip != null && $scope.settings.devices_data)
     {
       $scope.settings.filtered_devices = [];
@@ -457,6 +457,9 @@ angular.module('starter.controllers', [])
     $scope.settings.login_message = DataServer.login($scope.settings.user, $scope.settings.password).success(function(result){
       $scope.settings.show_login = false;
       $scope.settings.is_logged_in = false; 
+
+      //Send the GCM token to server if login successful
+      DataServer.send_gcm_token(StorageService.get('gcm_token'));
     }).error(function(data){
       console.log(data)
       $scope.settings.login_message = "Invalid login";
@@ -468,7 +471,9 @@ angular.module('starter.controllers', [])
     return d3.time.format('%d %B %Y %H:%M')(date);
   }
 
-  $scope.fetch_past_events = function(use_cache=true){
+  $scope.fetch_past_events = function(use_cache){
+    if(use_cache == undefined)
+      use_cache = true
     var events_data = StorageService.get('events');
     if(events_data == null || use_cache == false)
     {

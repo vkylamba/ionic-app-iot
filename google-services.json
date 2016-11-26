@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "753349360846",
+    "firebase_url": "https://iotforeverything-4d515.firebaseio.com",
+    "project_id": "iotforeverything-4d515",
+    "storage_bucket": "iotforeverything-4d515.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:753349360846:android:6403ba20be314bbc",
+        "android_client_info": {
+          "package_name": "com.ionicframework.iot853525"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "753349360846-8ktfbjcg117sc5cf27pcq4kggpcttrrl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA6LC_vwXgaQF-U8PnrN6rqDcng2s2Oq6M"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

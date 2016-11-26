@@ -7,7 +7,7 @@
 // 'starter.controllers' is found in controllers.js
 angular.module('starter', ['ionic', 'ngStorage', 'starter.controllers', 'starter.services', 'nvd3'])
 
-.run(function($ionicPlatform) {
+.run(function($ionicPlatform, DataServer, StorageService) {
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
@@ -20,6 +20,54 @@ angular.module('starter', ['ionic', 'ngStorage', 'starter.controllers', 'starter
       // org.apache.cordova.statusbar required
       StatusBar.styleDefault();
     }
+
+    var push = PushNotification.init({
+        android: {
+            senderID: "753349360846"
+        },
+        browser: {
+            pushServiceURL: 'http://push.api.phonegap.com/v1/push'
+        },
+        ios: {
+            alert: "true",
+            badge: true,
+            sound: 'false'
+        },
+        windows: {}
+    });
+
+    PushNotification.hasPermission(function(data) {
+        if (data.isEnabled) {
+            console.log('push notifications isEnabled');
+        }
+    });
+
+    push.on('registration', function(data) {
+        // data.registrationId
+        StorageService.add('gcm_token', data.registrationId);
+        var token = StorageService.get('token')
+        if(token != null)
+          DataServer.send_gcm_token(data.registrationId);
+        console.log("Push registration id: " + data.registrationId)
+        // persist the token in the Ionic Platform
+        push.saveToken(token);
+    });
+
+    push.on('notification', function(data) {
+        // data.messag
+        e,
+        // data.title,
+        // data.count,
+        // data.sound,
+        // data.image,
+        // data.additionalData
+        alert("Got pushed: " + data.message);
+    });
+
+    push.on('error', function(e) {
+        // e.message
+        alert("Push error: " + e.message);
+    });
   });
 })
 

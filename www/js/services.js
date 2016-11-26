@@ -137,6 +137,22 @@ angular.module('starter.services', [])
       })
     },
 
+    send_gcm_token: function(gcm_token) {
+
+      return $http({
+        method: 'GET',
+        url: settings.server_uri + '/api/user/gcm/'+gcm_token,
+        headers: {
+            "Authorization": 'Token ' + StorageService.get('token'),
+            'Access-Control-Request-Headers': 'Authorization',
+        }
+      }).success(function(data, status, headers, config) {
+        console.log(data);
+      }).error(function(data, status, headers, config) {
+        console.log(data);
+      })
+    },
+
     all: function() {
       return chats;
     },
