@@ -126,6 +126,16 @@ angular.module('starter', ['ionic', 'ngStorage', 'starter.controllers', 'starter
         controller: 'AccountCtrl'
       }
     }
+  })
+
+  .state('tab.event', {
+    url: '/event/:event_id',
+    views: {
+      'tab-chats': {
+        templateUrl: 'templates/create-event.html',
+        controller: 'EventCtrl',
+      }
+    }
   });
 
   // if none of the above states are matched, use this as the fallback

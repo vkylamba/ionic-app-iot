@@ -54,7 +54,8 @@ angular.module('starter.controllers', [])
     chart: {
       options: null,
       data: null,
-    }
+    },
+    chart_width: 1000
   };
 
   $scope.$on('$ionicView.enter', function(e) {
@@ -100,6 +101,11 @@ angular.module('starter.controllers', [])
       });
     }
   });
+
+  $scope.formatTime = function(d) {
+    var date = new Date(d);
+    return d3.time.format('%d %B %Y %H:%M')(date);
+  },
 
   $scope.select_device = function(device) {
     $scope.settings.picked_device = device;
@@ -270,6 +276,11 @@ angular.module('starter.controllers', [])
     if(plot_type == 'pieChart')
     {
       chartdata = chartdata[0].values;
+      $scope.settings.chart_width = 500;
+    }
+    else
+    {
+      $scope.settings.chart_width = 150*dev_data["time"].length;
     }
     $scope.settings.chart.options = options;
     $scope.settings.chart.data = chartdata;
@@ -328,7 +339,7 @@ angular.module('starter.controllers', [])
   }
 })
 
-.controller('DeviceDetailCtrl', function($scope, $stateParams, StorageService, DataServer) {
+.controller('DeviceDetailCtrl', function($scope, $stateParams, StorageService, DataServer, $state) {
 
   $scope.settings = {
     devices: JSON.parse(StorageService.get('devices')),
@@ -339,6 +350,12 @@ angular.module('starter.controllers', [])
     selected_command_val: null,
     device_command_vals: null,
     command_via_sms: false,
+
+    all_devices_events: null,
+
+    device_events:{
+      events_list: null,
+    }
   }
 
   $scope.search_device = function(device_id){
@@ -375,7 +392,36 @@ angular.module('starter.controllers', [])
         $scope.settings.device_data = JSON.parse(device_data);
         console.log($scope.settings.device_data)
       }
+
+      var all_devices_events = StorageService.get('user_events_list');
+      if(all_devices_events == null)
+      {
+        DataServer.get_events_list(null).success(function(data) {
+          all_devices_events = StorageService.get('user_events_list');
+          $scope.settings.all_devices_events = JSON.parse(all_devices_events);
+        });
+      }
+      else
+      {
+        $scope.settings.all_devices_events = JSON.parse(all_devices_events);
+      }
+
+      console.log("All user events: ");
+      console.log($scope.settings.all_devices_events);
+
+      var this_device_events = [];
+
+      for(event in $scope.settings.all_devices_events){
+        var this_event = $scope.settings.all_devices_events[event];
+        if(this_event.device == $scope.settings.selected_device.ip_address){
+          this_device_events.push(this_event);
+      }}
+
+      $scope.settings.device_events.events_list = this_device_events;
+      console.log("This device events: ");
+      console.log($scope.settings.device_events.events_list);
     }
+
   });
 
   $scope.selected_command_changed = function() {
@@ -406,6 +452,14 @@ angular.module('starter.controllers', [])
     var date = new Date(d);
     return d3.time.format('%d %B %Y %H:%M')(date);
   },
+
+  $scope.edit_event = function(event_id, device) {
+    // $state.go('tab.event');
+    if(event_id == 'new')
+      $state.go('tab.event', {'event_id': device});
+    else
+      $state.go('tab.event', {'event_id': event_id});
+  }
 
   $scope.doRefresh = function() {
     $scope.settings.selected_device = $scope.search_device($stateParams.chatId);
@@ -514,4 +568,48 @@ angular.module('starter.controllers', [])
     $ionicSideMenuDelegate.toggleLeft();
   };
 
-});
+})
+.controller('EventCtrl', function($scope, $ionicModal, $timeout, StorageService, DataServer, $stateParams) {
+
+  // With the new view caching in Ionic, Controllers are only called
+  // when they are recreated or on app start, instead of every page change.
+  // To listen for when this page is active (for example, to refresh data),
+  // listen for the $ionicView.enter event:
+  //$scope.$on('$ionicView.enter', function(e) {
+  //});
+  $scope.settings = {
+    event_id: null,
+    event_data: null,
+  };
+  $scope.$on('$ionicView.enter', function(e) {
+    // console.log($stateParams.event_id);
+
+    if($stateParams.event_id.indexOf('.') == -1)
+    {
+      $scope.settings.event_id = $stateParams.event_id;
+      var event_details = DataServer.get_event($stateParams.event_id).success(function(data) {
+        console.log(data);
+        $scope.settings.event_data = data;
+        $scope.settings.selected_event = data.event_type;
+      });
+    }
+    else
+    {
+      DataServer.get_all_event_types().success(function(data) {
+        $scope.settings.event_data = {
+          'device': $stateParams.event_id,
+          'available_event_types': data,
+        }
+      });
+      console.log($scope.settings.event_data)
+    }
+  });
+
+
+  $scope.create_event = function()
+  {
+    DataServer.create_event($scope.settings.event_id, $scope.settings.event_data).success(function() {
+      alert("Event created.")
+    })
+  }
+})

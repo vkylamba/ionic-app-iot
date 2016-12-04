@@ -41,11 +41,12 @@
           <p>Voltage: {{settings.device_data.latest_data.voltage}} V</p>
           <p>Current: {{settings.device_data.latest_data.current}} Amp</p>
           <p>Energy: {{settings.device_data.latest_data.energy}} KWH</p>
+          <p>Time: {{formatTime(settings.device_data.latest_data.data_arrival_time)}}</p>
         </div>
         <div class="item">
           Last week:
           <p>Avg power: {{(settings.device_data.last_week_report.power.avg/1000).toFixed(2)}} W</p>
-          <p>Total Enery Consumption: {{(settings.device_data.last_week_report.energy.maximum/3600000).toFixed(2)}} KWH</p>
+          <p>Total Enery Consumption: {{(settings.device_data.last_week_report.energy.maximum - settings.device_data.last_week_report.energy.maximum/3600000).toFixed(2)}} KWH</p>
           <p>Data packets received: {{settings.device_data.last_week_report.power.count}}</p>
         </div>
       </div>
@@ -106,6 +107,39 @@
           </button>
         </div>
       </div>
+
+      <div class="item item-button-right">
+        Show/set Alarms
+        <button class="button button-positive" ng-show="!settings.show_device_events" ng-click="settings.show_device_events=true">
+          <i class="icon ion-chevron-down"></i>
+        </button>
+        <button class="button button-positive" ng-show="settings.show_device_events" ng-click="settings.show_device_events=false">
+          <i class="icon ion-chevron-up"></i>
+        </button>
+      </div>
+
+      <ion-list ng-show="settings.show_device_events">
+        <ion-item class="item-remove-animate item-avatar item-icon-right" ng-repeat="event in settings.device_events.events_list" type="item-text-wrap">
+          <img ng-src="{{DataServer.settings.server_uri}}{{event.face}}">
+          <h2>{{event.event}}</h2>
+          Type: {{event.type}}<br>
+          Actions: {{event.actions.length}}
+          <i class="icon ion-chevron-right icon-accessory"></i>
+          <ion-option-button class="button-assertive" ng-click="edit_event(event.event_id, settings.device_data.ip_address)">
+            Change
+          </ion-option-button>
+        </ion-item>
+
+        <ion-item class="item-remove-animate item-avatar item-icon-right" type="item-text-wrap">
+          <img ng-src="{{DataServer.settings.server_uri}}{{event.face}}">
+          <h2>Add new event</h2>
+          <i class="icon ion-chevron-right icon-accessory"></i>
+          <ion-option-button class="button-assertive" ng-click="edit_event('new', settings.device_data.ip_address)">
+            Add
+          </ion-option-button>
+        </ion-item>
+      </ion-list>
+
   </div>
   </ion-content>
 </ion-view>

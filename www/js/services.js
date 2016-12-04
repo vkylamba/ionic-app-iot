@@ -137,6 +137,77 @@ angular.module('starter.services', [])
       })
     },
 
+    get_events_list: function(device_id) {
+
+      return $http({
+        method: 'GET',
+        url: settings.server_uri + '/api/events/list'+ (device_id != null? ('/' + device_id):''),
+        headers: {
+            "Authorization": 'Token ' + StorageService.get('token'),
+            'Access-Control-Request-Headers': 'Authorization',
+        }
+      }).success(function(data, status, headers, config) {
+        // this callback will be called asynchronously
+        // when the response is available
+        // console.log("data: " + JSON.stringify(data));
+        if(device_id != null)
+          StorageService.add(device_id+'_events_list', JSON.stringify(data));
+        else
+          StorageService.add('user_events_list', JSON.stringify(data));
+        return data;
+      })
+    },
+
+    get_all_event_types: function() {
+
+      return $http({
+        method: 'GET',
+        url: settings.server_uri + '/api/events/types',
+        headers: {
+            "Authorization": 'Token ' + StorageService.get('token'),
+            'Access-Control-Request-Headers': 'Authorization',
+        }
+      }).success(function(data, status, headers, config) {
+        return data;
+      })
+    },
+
+
+    get_event: function(event_id) {
+
+      return $http({
+        method: 'GET',
+        url: settings.server_uri + '/api/events/'+ event_id,
+        headers: {
+            "Authorization": 'Token ' + StorageService.get('token'),
+            'Access-Control-Request-Headers': 'Authorization',
+        }
+      }).success(function(data, status, headers, config) {
+        // this callback will be called asynchronously
+        // when the response is available
+        // console.log("data: " + JSON.stringify(data));
+        return data;
+      })
+    },
+
+    create_event: function(event_id, event_data) {
+
+      return $http({
+        method: 'POST',
+        url: settings.server_uri + '/api/events/create/'+ (event_id != null?(event_id):''),
+        headers: {
+            "Authorization": 'Token ' + StorageService.get('token'),
+            'Access-Control-Request-Headers': 'Authorization',
+        },
+        data: event_data
+      }).success(function(data, status, headers, config) {
+        // this callback will be called asynchronously
+        // when the response is available
+        // console.log("data: " + JSON.stringify(data));
+        return data;
+      })
+    },
+
     send_gcm_token: function(gcm_token) {
 
       return $http({
